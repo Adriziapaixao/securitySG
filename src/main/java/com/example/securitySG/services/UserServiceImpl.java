@@ -50,7 +50,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public Map<String, String> login(LoginDto loginDto) {
-        return Map.of();
+        return Map.of("username", loginDto.getUsername(),
+                "password", loginDto.getPassword()
+        );
     }
 }
 
