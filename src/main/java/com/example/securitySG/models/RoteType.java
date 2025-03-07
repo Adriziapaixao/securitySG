@@ -1,4 +1,4 @@
-package models;
+package com.example.securitySG.models;
 
 public enum RoteType {
     ROLE_ADMIN,

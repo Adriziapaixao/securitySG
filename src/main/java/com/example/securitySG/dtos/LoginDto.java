@@ -1,4 +1,4 @@
-package dtos;
+package com.example.securitySG.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

@@ -1,4 +1,4 @@
-package models;
+package com.example.securitySG.models;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
