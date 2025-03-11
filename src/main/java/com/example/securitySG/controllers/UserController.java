@@ -1,7 +1,8 @@
 package com.example.securitySG.controllers;
 
-import com.example.securitySG.dtos.LoginDto;
-import com.example.securitySG.dtos.UserDto;
+import com.example.securitySG.controllers.dtos.LoginDto;
+import com.example.securitySG.controllers.dtos.RegisterUserDto;
+import com.example.securitySG.controllers.dtos.UserResponseDto;
 import com.example.securitySG.models.UserEntity;
 import com.example.securitySG.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,25 +24,17 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    public UserController(UserService userService) {
-        this.userService = userService;
-    }
 
     @PostMapping("/user")
-    public UserDto createUser(@RequestBody UserDto userDto){
-        return userService.createUser(userDto);
+    public RegisterUserDto createUser(@RequestBody RegisterUserDto registerUserDto){
+        return userService.createUser(registerUserDto);
     }
 
-    @PostMapping("/login")
-    public Map<String, String> login(@RequestBody LoginDto loginDto){
-        return userService.login(loginDto);
+    @GetMapping
+    public UserResponseDto getDetails() {
+        return userService.getDetails();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<UserEntity> getUserDetails (@PathVariable Long id) {
-        Optional<UserEntity> user = userService.getDetails(id);
-        return user.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
 
     // Tratamento de exceções de validação
     @ExceptionHandler(MethodArgumentNotValidException.class)

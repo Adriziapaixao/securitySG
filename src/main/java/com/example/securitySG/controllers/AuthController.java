@@ -1,5 +1,6 @@
 package com.example.securitySG.controllers;
 
+import com.example.securitySG.controllers.dtos.LoginDto;
 import com.example.securitySG.services.AuthService;
 import lombok.AllArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,11 @@ public class AuthController {
 
     @Autowired
     private AuthService authService;
+
+    @PostMapping("/login")
+    public String login(@RequestBody LoginDto loginDto){
+        return authService.login(loginDto);
+    }
 
     @PostMapping("/refresh-token")
     public ResponseEntity<String> refreshToken(@RequestHeader("refresh-token") String refreshToken){
