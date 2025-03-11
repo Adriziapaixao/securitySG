@@ -1,58 +1,71 @@
 package com.example.securitySG.services;
 
-import com.example.securitySG.dtos.LoginDto;
-import com.example.securitySG.dtos.UserDto;
+import com.example.securitySG.controllers.dtos.RegisterUserDto;
+import com.example.securitySG.controllers.dtos.UserResponseDto;
+import com.example.securitySG.infra.config.JwtTokenProvider;
+import com.example.securitySG.models.RoleEntity;
 import com.example.securitySG.models.UserEntity;
+import com.example.securitySG.repostories.RoleRepository;
 import com.example.securitySG.repostories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 
-import java.util.Map;
-import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class UserServiceImpl implements UserService {
 
-    private UserRepository userRepository;
-    private PasswordEncoder bCryptPasswordEncoder;
-
     @Autowired
-    public UserServiceImpl(UserRepository userRepository, PasswordEncoder bCryptPasswordEncoder) {
+    private final UserRepository userRepository;
+    @Autowired
+    private final PasswordEncoder bCryptPasswordEncoder;
+    @Autowired
+    private RoleRepository roleRepository;
+    @Autowired
+    private final JwtTokenProvider jwtTokenProvider;
+
+
+    public UserServiceImpl(UserRepository userRepository, PasswordEncoder bCryptPasswordEncoder, JwtTokenProvider jwtTokenProvider) {
         this.userRepository = userRepository;
         this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.jwtTokenProvider = jwtTokenProvider;
+        this.roleRepository = roleRepository;
+
     }
 
-    @Override
-    public UserDto createUser(UserDto userEntrada) {
-        String passwordEncoder = bCryptPasswordEncoder.encode(userEntrada.getPassword());
-        UserEntity userParaSalvar = new UserEntity();
-            userParaSalvar.setName(userEntrada.getName());
-            userParaSalvar.setUsername(userEntrada.getUsername());
-            userParaSalvar.setEmail(userEntrada.getEmail());
-            userParaSalvar.setPassword(passwordEncoder);
+    public RegisterUserDto createUser(RegisterUserDto registerUserDto) {
+        // Verificar se o e-mail já existe
+        if (userRepository.existsByUsername(registerUserDto.getUsername())) {
+            throw new IllegalArgumentException("Username já existe no banco de dados.");
+        }
 
-        UserEntity userSalvo = userRepository.save(userParaSalvar);
-        UserDto usuarioParaRetorno = new UserDto();
-            usuarioParaRetorno.setId(userSalvo.getId());
-            usuarioParaRetorno.setName(userSalvo.getName());
-            usuarioParaRetorno.setUsername(userSalvo.getUsername());
-            usuarioParaRetorno.setEmail(userSalvo.getEmail());
+        UserEntity user = new UserEntity();
+        user.setUsername(registerUserDto.getUsername());
+        user.setEmail(registerUserDto.getEmail());
+        user.setPassword(bCryptPasswordEncoder.encode(registerUserDto.getPassword()));
+        user.setName(registerUserDto.getName());
 
-        return usuarioParaRetorno;
+        Set<RoleEntity> roles = registerUserDto.getRoles().stream().map(r -> new RoleEntity(r.name())).collect(Collectors.toSet());
+        roleRepository.saveAll(roles);
+
+        user.setRoles(roles);
+        userRepository.save(user);
+        return registerUserDto;
     }
 
-    @Override
-    public Optional<UserEntity> getDetails(Long userId){
-        return userRepository.findById(userId);
+    public UserResponseDto getDetails() {
+        JwtServiceImpl jwtService = new JwtServiceImpl();
+        String userName = jwtService.getUsername();
+        UserEntity user = userRepository.findByUsername(userName).orElseThrow(() ->
+                new UsernameNotFoundException("User not exists by Username or Email"));
+        String message = String.format("Bem-vindo, %s!", user.getName());
+        String department = jwtService.getDepartment();
+        return new UserResponseDto(message, department);
     }
 
-    @Override
-    public Map<String, String> login(LoginDto loginDto) {
-        return Map.of("username", loginDto.getUsername(),
-                "password", loginDto.getPassword()
-        );
-    }
 }
 
