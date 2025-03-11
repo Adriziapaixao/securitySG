@@ -1,4 +1,4 @@
-package com.example.securitySG.dtos;
+package com.example.securitySG.controllers.dtos;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -9,10 +9,7 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserDto {
-    private Long id;
-    private String name;
+public class LoginDto {
     private String username;
-    private String email;
     private String password;
 }
