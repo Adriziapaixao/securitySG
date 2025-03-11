@@ -30,4 +30,8 @@ public class RefreshTokenEntity {
 
     @Column(nullable = false)
     private Instant expiryDate;
+
+    public void setUsername(String username) {
+
+    }
 }

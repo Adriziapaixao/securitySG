@@ -1,4 +1,4 @@
-package com.example.securitySG.models;
+package com.example.securitySG.controllers.dtos;
 
 public enum RoteType {
     ROLE_ADMIN,

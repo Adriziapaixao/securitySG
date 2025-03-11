@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-@NoArgsConstructor
+
 @Data
 @Entity
 @Table(name = "roles")
@@ -15,11 +15,18 @@ public class RoleEntity {
     private Long id;
     private String name;
 
-    public void RoleEntity(String name) {
+    public RoleEntity(String name) {
         this.name = name;
     }
-    public void RoleEntity(){
+
+    public RoleEntity(){
 
     }
+
+    public String name() {
+        return name;
+    }
 }
+
+
 
